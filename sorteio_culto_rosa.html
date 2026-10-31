@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#760b3d">
+  <title>Sorteio | Culto Rosa — Floresça como Girassol</title>
+  <style>
+    :root {
+      --wine: #790b42;
+      --wine-dark: #4c082b;
+      --pink: #f8dce8;
+      --gold: #f4a900;
+      --gold-light: #ffd76b;
+      --cream: #fff9ed;
+      --ink: #5a1236;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(ellipse at 50% 28%, rgba(255,255,255,.97) 0 20%, rgba(255,248,235,.91) 48%, transparent 72%),
+        linear-gradient(135deg, #f8d8e3, #fff4d6 48%, #f7d4e1);
+      overflow-x: hidden;
+      position: relative;
+    }
+    body::before, body::after {
+      content: "🌻";
+      position: fixed;
+      font-size: clamp(5rem, 14vw, 12rem);
+      opacity: .19;
+      z-index: -1;
+      filter: drop-shadow(0 8px 8px rgba(99,45,0,.15));
+      pointer-events: none;
+    }
+    body::before { top: -25px; left: -38px; transform: rotate(-22deg); }
+    body::after { bottom: -40px; right: -35px; transform: rotate(18deg); }
+    .page {
+      width: min(100% - 28px, 980px);
+      margin: 0 auto;
+      padding: 30px 0 36px;
+    }
+    .top {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--wine);
+      font: 800 .9rem/1.2 Arial, sans-serif;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before, .eyebrow::after {
+      content: "";
+      height: 2px;
+      width: 46px;
+      background: var(--wine);
+      border-radius: 9px;
+    }
+    h1 {
+      margin: 9px 0 0;
+      color: var(--wine);
+      font-size: clamp(2.5rem, 7vw, 5.2rem);
+      line-height: .95;
+      font-weight: 700;
+      letter-spacing: -.045em;
+      text-shadow: 0 3px 0 rgba(255,255,255,.8);
+    }
+    h1 span {
+      display: block;
+      color: #e59a00;
+      font-style: italic;
+      text-shadow: 1px 2px 0 #fff;
+    }
+    .verse {
+      margin: 14px 0 0;
+      font-size: clamp(1rem, 2.6vw, 1.35rem);
+      font-style: italic;
+      color: #74113e;
+    }
+    .card {
+      background: rgba(255,255,255,.84);
+      border: 1px solid rgba(133, 22, 75, .17);
+      border-radius: 28px;
+      box-shadow: 0 18px 55px rgba(94, 23, 53, .15);
+      padding: clamp(20px, 4vw, 38px);
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+    .card-label {
+      font: 800 .78rem/1.2 Arial, sans-serif;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: #9a5a00;
+    }
+    .number-stage {
+      margin: 20px auto;
+      width: min(100%, 390px);
+      min-height: 245px;
+      display: grid;
+      place-items: center;
+      border-radius: 30px;
+      border: 3px solid #f0b62e;
+      background:
+        radial-gradient(circle at 50% 40%, #fff 0 28%, transparent 65%),
+        linear-gradient(145deg, #fff4d8, #ffe6ef);
+      box-shadow: inset 0 0 0 7px rgba(255,255,255,.65), 0 10px 24px rgba(119,11,65,.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .number-stage::before, .number-stage::after {
+      content: "✿";
+      position: absolute;
+      color: rgba(231, 164, 18, .22);
+      font-size: 5rem;
+    }
+    .number-stage::before { left: 15px; top: 7px; transform: rotate(-20deg); }
+    .number-stage::after { right: 15px; bottom: 0; transform: rotate(20deg); }
+    #number {
+      color: var(--wine);
+      font: 900 clamp(6rem, 22vw, 10rem)/1 Arial, sans-serif;
+      letter-spacing: -.08em;
+      text-shadow: 0 5px 0 rgba(239,171,28,.25);
+      position: relative;
+      z-index: 1;
+    }
+    #number.placeholder { color: #d7b8c6; }
+    #number.animate { animation: pop .48s cubic-bezier(.2,1.5,.4,1); }
+    @keyframes pop {
+      0% { transform: scale(.45) rotate(-10deg); opacity: .3; }
+      75% { transform: scale(1.12) rotate(2deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0); }
+    }
+    .draw-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 17px 36px;
+      min-width: min(100%, 280px);
+      background: linear-gradient(110deg, #870b49, #b31962);
+      color: white;
+      font: 800 1rem Arial, sans-serif;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #51082d, 0 14px 24px rgba(111,8,57,.22);
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+    }
+    .draw-button:hover { transform: translateY(-2px); box-shadow: 0 10px 0 #51082d, 0 18px 26px rgba(111,8,57,.22); }
+    .draw-button:active { transform: translateY(5px); box-shadow: 0 3px 0 #51082d; }
+    .draw-button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .secondary {
+      border: 1px solid #9a245a;
+      background: #fff;
+      color: var(--wine);
+      border-radius: 999px;
+      padding: 11px 18px;
+      font: 700 .88rem Arial, sans-serif;
+      cursor: pointer;
+    }
+    .secondary:hover { background: #fff0f6; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      max-width: 470px;
+      margin: 24px auto 0;
+    }
+    .stat {
+      background: #fff7e9;
+      border: 1px solid #f1d69b;
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .stat strong {
+      display: block;
+      color: var(--wine);
+      font: 900 1.8rem Arial, sans-serif;
+    }
+    .stat span {
+      color: #80542b;
+      font: 700 .72rem Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .history {
+      margin-top: 25px;
+      text-align: left;
+    }
+    .history h2 {
+      text-align: center;
+      margin: 0 0 14px;
+      color: var(--wine);
+      font-size: 1.35rem;
+    }
+    #drawnNumbers {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+    }
+    .chip {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      color: white;
+      background: linear-gradient(145deg, #a20e57, #650a39);
+      border: 2px solid #f4c65e;
+      font: 800 1rem Arial, sans-serif;
+      box-shadow: 0 3px 8px rgba(94, 8, 49, .15);
+    }
+    .empty {
+      color: #9b7b89;
+      font: italic .95rem Arial, sans-serif;
+      padding: 8px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 22px;
+      color: #75113e;
+    }
+    .footer strong {
+      display: block;
+      font: 900 1.25rem Arial, sans-serif;
+      letter-spacing: .08em;
+    }
+    .footer span { font-style: italic; }
+    .message {
+      min-height: 22px;
+      margin: 14px 0 0;
+      color: #8a174b;
+      font: 700 .9rem Arial, sans-serif;
+    }
+    @media (max-width: 520px) {
+      .page { width: min(100% - 18px, 980px); padding-top: 22px; }
+      .card { border-radius: 22px; padding: 19px 13px; }
+      .number-stage { min-height: 210px; }
+      .draw-button { width: 100%; }
+    }
+    @media print {
+      body { background: white; }
+      .actions, .draw-button { display: none; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <div class="eyebrow">Culto Rosa</div>
+      <h1>Floresça <span>como Girassol!</span></h1>
+      <p class="verse">“Eu sou a luz do mundo.” — João 8:12</p>
+    </header>
+
+    <section class="card" aria-label="Sorteio de números de 1 a 50">
+      <div class="card-label">✨ Sorteio especial ✨</div>
+      <div class="number-stage" aria-live="polite" aria-atomic="true">
+        <div id="number" class="placeholder">?</div>
+      </div>
+      <button id="drawButton" class="draw-button" type="button">🌻 Sortear número</button>
+      <p id="message" class="message">Toque no botão para sortear o primeiro número!</p>
+
+      <div class="stats">
+        <div class="stat">
+          <strong id="drawnCount">0</strong>
+          <span>Números sorteados</span>
+        </div>
+        <div class="stat">
+          <strong id="remainingCount">50</strong>
+          <span>Números restantes</span>
+        </div>
+      </div>
+
+      <div class="history">
+        <h2>🌼 Números já sorteados</h2>
+        <div id="drawnNumbers"><span class="empty">Os números sorteados aparecerão aqui.</span></div>
+      </div>
+
+      <div class="actions">
+        <button id="undoButton" class="secondary" type="button" disabled>↶ Desfazer último</button>
+        <button id="resetButton" class="secondary" type="button">⟲ Reiniciar sorteio</button>
+        <button id="fullscreenButton" class="secondary" type="button">⛶ Tela cheia</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <strong>ADEMA</strong>
+      <span>Ministrando o Amor</span>
+    </footer>
+  </main>
+
+  <script>
+    const MIN = 1;
+    const MAX = 50;
+    let availableNumbers = Array.from({ length: MAX - MIN + 1 }, (_, i) => i + MIN);
+    let drawnNumbers = [];
+
+    const numberEl = document.getElementById('number');
+    const drawButton = document.getElementById('drawButton');
+    const undoButton = document.getElementById('undoButton');
+    const resetButton = document.getElementById('resetButton');
+    const fullscreenButton = document.getElementById('fullscreenButton');
+    const drawnCountEl = document.getElementById('drawnCount');
+    const remainingCountEl = document.getElementById('remainingCount');
+    const drawnNumbersEl = document.getElementById('drawnNumbers');
+    const messageEl = document.getElementById('message');
+
+    function render() {
+      drawnCountEl.textContent = drawnNumbers.length;
+      remainingCountEl.textContent = availableNumbers.length;
+      undoButton.disabled = drawnNumbers.length === 0;
+      drawButton.disabled = availableNumbers.length === 0;
+
+      drawnNumbersEl.innerHTML = '';
+      if (drawnNumbers.length === 0) {
+        const empty = document.createElement('span');
+        empty.className = 'empty';
+        empty.textContent = 'Os números sorteados aparecerão aqui.';
+        drawnNumbersEl.appendChild(empty);
+      } else {
+        drawnNumbers.forEach(number => {
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.textContent = number;
+          chip.title = `Número ${number}`;
+          drawnNumbersEl.appendChild(chip);
+        });
+      }
+
+      if (availableNumbers.length === 0) {
+        messageEl.textContent = 'Todos os 50 números já foram sorteados. Que Deus abençoe!';
+        drawButton.textContent = 'Sorteio finalizado';
+      } else {
+        drawButton.textContent = '🌻 Sortear número';
+      }
+    }
+
+    function drawNumber() {
+      if (availableNumbers.length === 0) return;
+
+      // Escolhe um número disponível sem repetir nenhum número.
+      const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+      const [chosen] = availableNumbers.splice(randomIndex, 1);
+      drawnNumbers.push(chosen);
+
+      numberEl.classList.remove('animate');
+      void numberEl.offsetWidth;
+      numberEl.textContent = String(chosen).padStart(2, '0');
+      numberEl.classList.remove('placeholder');
+      numberEl.classList.add('animate');
+      messageEl.textContent = `O número sorteado foi ${chosen}!`;
+      render();
+    }
+
+    function undoLast() {
+      if (drawnNumbers.length === 0) return;
+      const last = drawnNumbers.pop();
+      availableNumbers.push(last);
+      availableNumbers.sort((a, b) => a - b);
+      numberEl.textContent = drawnNumbers.length
+        ? String(drawnNumbers[drawnNumbers.length - 1]).padStart(2, '0')
+        : '?';
+      if (drawnNumbers.length === 0) numberEl.classList.add('placeholder');
+      messageEl.textContent = `O número ${last} voltou para o sorteio.`;
+      render();
+    }
+
+    function resetDraw() {
+      if (drawnNumbers.length && !confirm('Deseja realmente reiniciar? Todos os números voltarão para o sorteio.')) return;
+      availableNumbers = Array.from({ length: MAX - MIN + 1 }, (_, i) => i + MIN);
+      drawnNumbers = [];
+      numberEl.textContent = '?';
+      numberEl.classList.add('placeholder');
+      messageEl.textContent = 'Sorteio reiniciado! Boa sorte!';
+      render();
+    }
+
+    drawButton.addEventListener('click', drawNumber);
+    undoButton.addEventListener('click', undoLast);
+    resetButton.addEventListener('click', resetDraw);
+    fullscreenButton.addEventListener('click', async () => {
+      try {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+        else await document.exitFullscreen();
+      } catch {
+        messageEl.textContent = 'Não foi possível ativar a tela cheia neste navegador.';
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
